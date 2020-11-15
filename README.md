@@ -4,6 +4,9 @@
 ## Prerequisites & Installation
 2D_FE_Global_DIC MATLAB code was tested on MATLAB versions later than R2018a. Please download and unzip the code to the MATLAB working path. Then, execute the mail file main_FE_Global_DIC.m.
 
+## Code Manual
+It is already included in the code. It's also available at my Researchgate: https://www.researchgate.net/publication/345907429_Finite_Element_Global_Digital_Image_Correlation_FE-Global-DIC_Code_Manual_v10
+
 ## Citation
 * [1] Yang, J. and Bhattacharya, K. Augmented Lagrangian Digital Image Correlation. Exp.Mech. 59: 187, 2018. https://doi.org/10.1007/s11340-018-00457-0.   or 
 * Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation  
