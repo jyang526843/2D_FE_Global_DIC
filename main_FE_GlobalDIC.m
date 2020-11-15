@@ -97,7 +97,7 @@ for ImgSeqNum = 2:length(ImgNormalized)
     % Finite element based global DIC iterations
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     DICpara.tol = 1e-4; % iteration stopping threshold 
-    alphaList = 1e3; % ?Set regularization coefficient, alpha, as 100
+    alphaList = 1e1; % Set regularization coefficient, alpha, as 10
     
     % ====== Tune regularization coefficient ======
     % If you don't know the best alpha (coefficient), please run the following
