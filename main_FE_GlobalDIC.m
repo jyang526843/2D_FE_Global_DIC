@@ -114,7 +114,7 @@ for ImgSeqNum = 2:length(ImgNormalized)
         
         tic; alpha = alphaList(alphaInd); 
         % Solve displacement U with each alpha
-        [U, normOfW, timeICGN] = GlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha,DICpara.tol);
+        [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha,DICpara.tol);
         % Compute F deformation gradient with solved U
         GaussPtOrder = 2; [F] = funGlobal_NodalStrainAvg(DICmesh,U,GaussPtOrder);
         
