@@ -12,7 +12,7 @@ It is already included in the code. It's also available at my Researchgate: http
 * Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation  
 
 ## Contact and support
-Jin Yang (Caltech solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
+Jin Yang (Caltech, solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
 
 Welcome to give the 2D_FE_Global_DIC code ratings and comments in the MATLAB File Exchange community: 
 [![View 2D Finite Element Global Digital Image Correlation (FE-DIC) on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/82873-2d-finite-element-global-digital-image-correlation-fe-dic)
