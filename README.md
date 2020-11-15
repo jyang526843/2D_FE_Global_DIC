@@ -1,4 +1,4 @@
-# 2D_FE_Global_DIC
+# Finite element Global Digital Image Correlation (2D_FE_Global_DIC)
 2D Finite-element-based global DIC method (guarantee global kinematic compatibility and decrease noise by adding regularization penalties).  
  
 ## Prerequisites & Installation
@@ -7,7 +7,6 @@
 ## Citation
 * [1] Yang, J. and Bhattacharya, K. Augmented Lagrangian Digital Image Correlation. Exp.Mech. 59: 187, 2018. https://doi.org/10.1007/s11340-018-00457-0.   or 
 * Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation  
-
 
 ## Contact and support
 Jin Yang (Caltech solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
