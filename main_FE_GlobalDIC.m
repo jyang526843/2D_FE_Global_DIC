@@ -162,7 +162,7 @@ UWorld = U; UWorld(2:2:end) = -U(2:2:end);
 FWorld = F; % Transform into the physical world coordinates
 close all; Plotuv(UWorld,DICmesh.x0,DICmesh.y0World); 
 Plotdisp_show(UWorld,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM);
-Plotstrain_show(F,coordinatesFEMWorld,elementsFEM);
+Plotstrain_show(F,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM);
 
 
 %% ------ Save results ------
