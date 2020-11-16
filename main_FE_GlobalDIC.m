@@ -98,7 +98,7 @@ for ImgSeqNum = 2:length(ImgNormalized)
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     DICpara.tol = 1e-4; % iteration stopping threshold 
     DICpara.maxIter = 100; % Maximum IC-GN iterations in IC-GN iterations
-    DICpara.alpha = 1e2; % Set regularization coefficient, alpha, as 10
+    DICpara.alpha = 10; % Set regularization coefficient, alpha, as 10
     alphaList = DICpara.alpha;
     
     % ====== Tune regularization coefficient ======
