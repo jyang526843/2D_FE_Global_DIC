@@ -1,5 +1,5 @@
 % =========================================================
-% function GlobalICGN to solve FE iterations for global DIC
+% function funGlobalICGN to solve FE iterations for global DIC
 % ---------------------------------------------------------
 %   INPUT: 
 %       DIC mesh, DIC image pair, 
@@ -14,7 +14,7 @@
 % Date: 2020.10
 % =========================================================
 
-function [U, normOfW, TimeICGN] = GlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol)
+function [U, normOfW, TimeICGN] = funGlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol)
 
 
 coordinatesFEM = DICmesh.coordinatesFEM;
