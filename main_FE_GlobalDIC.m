@@ -97,7 +97,9 @@ for ImgSeqNum = 2:length(ImgNormalized)
     % Finite element based global DIC iterations
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     DICpara.tol = 1e-4; % iteration stopping threshold 
-    alphaList = 1e1; % Set regularization coefficient, alpha, as 10
+    DICpara.maxIter = 100; % Maximum IC-GN iterations in IC-GN iterations
+    DICpara.alpha = 1e2; % Set regularization coefficient, alpha, as 10
+    alphaList = DICpara.alpha;
     
     % ====== Tune regularization coefficient ======
     % If you don't know the best alpha (coefficient), please run the following
@@ -107,20 +109,18 @@ for ImgSeqNum = 2:length(ImgNormalized)
     % alphaList = [1e-3,1e-2,1e-1,1e0,1e1,1e2,1e3]*mean(DICpara.winstepsize);
     
     Err1List = zeros(length(alphaList),1); Err2List=Err1List; UList = cell(length(alphaList),1); FList=UList;
-    %hbar = waitbar(0,'Please wait for FE-based global DIC iterations!');
-    
+     
     % ------------------------------------------------ 
     for alphaInd = 1:length(alphaList)
         
         tic; alpha = alphaList(alphaInd); 
         % Solve displacement U with each alpha
-        [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha,DICpara.tol);
+        [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha,DICpara.tol,DICpara.maxIter);
         % Compute F deformation gradient with solved U
-        GaussPtOrder = 2; [F] = funGlobal_NodalStrainAvg(DICmesh,U,GaussPtOrder);
+        DICpara.GaussPtOrder = 2; [F] = funGlobal_NodalStrainAvg(DICmesh,U,DICpara.GaussPtOrder);
         
         Err1List(alphaInd) = norm(U-U0,2);
         Err2List(alphaInd) = norm(F,2); 
-        %waitbar(alphaInd/(length(alphaList)+1));
          
     end
     
@@ -134,13 +134,13 @@ for ImgSeqNum = 2:length(ImgNormalized)
     catch
         alpha_best = alphaList(indexOfalpha); 
     end
-    DICpara.alpha = alpha_best;
+    DICpara.alpha = alpha_best; % If you just have one item in the alphaList, this line doens't change anything.
     
     
     % ====== Re-run global DIC iterations with tuned alpha_best ======
     if abs(alpha_best - alpha) > abs(eps)
-        [U, normOfW, timeICGN] = GlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha_best,DICpara.tol);
-        GaussPtOrder = 2; [F] = funGlobal_NodalStrainAvg(DICmesh,U,GaussPtOrder);    
+        [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,fNormalized,gNormalized,U0,alpha_best,DICpara.tol,DICpara.maxIter);
+        DICpara.GaussPtOrder = 2; [F] = funGlobal_NodalStrainAvg(DICmesh,U,DICpara.GaussPtOrder);    
     end
     
     % ------- Smooth strain field --------
@@ -284,63 +284,15 @@ for ImgSeqNum = 2:length(ImgNormalized)
     SaveFigFiles;
     
 end
-% ------ Save movies ------
+% ------ End of image sequence! ------
 fprintf('------------ Section 5 Done ------------ \n \n')
 
-
-
-%% ------- Store images ------
-% imgNo = 0570;
-% mean(FStraintemp(1:4:end)) % -0.0029(57939_WS20ST10) -0.0029(57939_WS40ST10) -5.03e-4(57383_WS20ST10)  -5.02e-4(57383_WS40ST10)
-% mean(FStraintemp(4:4:end)) % 0.0056(57939_WS20ST10) 0.0056(57939_WS40ST10) 3.804e-4(57383_WS20ST10)  3.85e-4(57383_WS20ST10)
-% 0.5*(mean(FStraintemp(2:4:end))+mean(FStraintemp(3:4:end))) % -5.7438e-4(57939_WS20ST10)  -5.7665e-4(57939_WS40ST10) -1.06e-4(57383_WS20ST10)  -1.0456e-4(57383_WS40ST10)
-
+  
 
 %% Save data again including strain solve method
 results_name = ['results_FE_globalDIC_',imgname,'_st',num2str(DICpara.winstepsize),'_alpha',num2str(DICpara.alpha),'.mat'];
 save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrain','ResultFEMesh',...
      'normOfW','timeICGN');
 
- 
- 
-%%
-fig=figure; ax=axes(fig); plot(normOfW,'ko-','linewidth',1); set(gca,'yscale','log');
-adjust_fig(fig,ax,'','Iteration $k$','$|u^{k+1}-u^{k}|$'); axis([1,11,1e-5,1e1]);
-yticks([1e-5, 1e-3, 1e-1, 1e1])
-
-
-%%
-fig=figure; ax=axes(fig); plot(normOfWList(:,1),'+-','markersize',2,'linewidth',1); 
-hold on; plot(normOfWList(:,2),'s-','markersize',2,'linewidth',1); 
-hold on; plot(normOfWList(:,3),'^-','markersize',2,'linewidth',1); 
-hold on; plot(normOfWList(:,4),'d-','markersize',2,'linewidth',1); 
-hold on; plot(normOfWList(:,5),'<-','markersize',2,'linewidth',1); 
-hold on; plot(normOfWList(:,6),'>-','markersize',2,'linewidth',1); 
-set(gca,'yscale','log');
-adjust_fig(fig,ax,'','Iteration $k$','$|u^{k+1}-u^{k}|$'); axis([1,100,1e-5,1e1]);
-lgd=legend('$\alpha=10^{-1}$','$\alpha=10^{0}$','$\alpha=10^{1}$','$\alpha=10^{2}$','$\alpha=10^{3}$','$\alpha=10^{4}$');
-set(lgd,'interpreter','latex');
-
-
-%% Plot errors to fit best alpha
-fig=figure; ax=axes(fig); plot(alphaList,Err1List,'o-','linewidth',1); hold on;
-plot(alphaList,Err2List,'x-','linewidth',1); set(gca,'yscale','log'); set(gca,'xscale','log');
-adjust_fig(fig,ax,'','$\alpha$','$|u^{k+1}-u^{k}|$'); axis([1e-1,1e4,1e-3,1e4]);
-title('$|\nabla u^{k+1}|$','interpreter','latex');
-xticks([1e-1,1e0,1e1,1e2,1e3,1e4]); yticks([1e-2,1e0,1e2,1e4]);
-
-
-fig=figure; ax=axes(fig); plot(Err1List,1*mean(DICpara.winstepsize)*Err2List,'ks','linewidth',1);
-adjust_fig(fig,ax,'','$|u^{k+1}-u^{k}|$','$|\nabla u^{k+1}|$');  
-axis([0,600,0,40]);
-% xticks([0,500,1000]); xticklabels({'0','500','1000'});
-% xticks([1e-1,1e0,1e1,1e2,1e3,1e4]);
-
-
-fig=figure; ax=axes(fig); plot(alphaList,ErrSumList,'k^-','linewidth',1);
-set(gca,'yscale','log'); set(gca,'xscale','log');
-adjust_fig(fig,ax,'','$\alpha$','$|u^{k+1}-u^{k}|+|\nabla u^{k+1}|$');  
-axis([1e-1,1e4,1e1,1e3]);
-xticks([1e-1,1e0,1e1,1e2,1e3,1e4]); yticks([1e1,1e2,1e3]);
  
 
