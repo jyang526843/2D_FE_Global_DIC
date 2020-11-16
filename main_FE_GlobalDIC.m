@@ -31,6 +31,9 @@ ResultDisp = cell(length(ImgNormalized)-1,1);
 ResultDefGrad = cell(length(ImgNormalized)-1,1);
 ResultStrain = cell(length(ImgNormalized)-1,1);
 ResultFEMesh = cell(ceil((length(ImgNormalized)-1)/DICpara.ImgSeqIncUnit),1); % For incremental DIC mode
+ResultAlpha = cell(length(ImgNormalized)-1,1);
+ResultNormOfW = cell(length(ImgNormalized)-1,1);
+ResultTimeICGN = cell(length(ImgNormalized)-1,1);
 fprintf('------------ Section 2 Done ------------ \n \n')
 
 
@@ -150,6 +153,9 @@ for ImgSeqNum = 2:length(ImgNormalized)
     % ------- Save data -------
     ResultDisp{ImgSeqNum-1}.U = full(U);
     ResultDefGrad{ImgSeqNum-1}.F = full(F); % tempFoamAL;
+    ResultAlpha{ImgSeqNum-1}.alpha = alpha_best;
+    ResultNormOfW{ImgSeqNum-1}.normOfW = full(normOfW);
+    ResultTimeICGN{ImgSeqNum-1}.timeICGN = full(timeICGN);
     
     fprintf('------------ Section 4 Done ------------ \n \n')
     
@@ -290,9 +296,9 @@ fprintf('------------ Section 5 Done ------------ \n \n')
   
 
 %% Save data again including strain solve method
-results_name = ['results_FE_globalDIC_',imgname,'_st',num2str(DICpara.winstepsize),'_alpha',num2str(DICpara.alpha),'.mat'];
+results_name = ['results_FE_globalDIC_',imgname,'_st',num2str(DICpara.winstepsize(1)),'_alpha',num2str(DICpara.alpha),'.mat'];
 save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrain','ResultFEMesh',...
-     'normOfW','timeICGN');
+     'ResultAlpha','ResultNormOfW','ResultTimeICGN');
 
  
 
