@@ -1,5 +1,5 @@
 % =========================================================
-% function funGlobalICGN to solve FE iterations for global DIC
+% function GlobalICGN to solve FE iterations for global DIC
 % ---------------------------------------------------------
 %   INPUT: 
 %       DIC mesh, DIC image pair, 
@@ -8,13 +8,13 @@
 %   OUTPUT:
 %       U: Solved displacement field;
 %       normOfW: FE-based global DIC iteration update norm;
-%       TimeICGN: Time cost for each FE-based global DIC iteration;
+%       timeICGN: Time cost for each FE-based global DIC iteration;
 %
 % Author: Jin Yang, jyang526@wisc.edu or aldicdvc@gmail.com
 % Date: 2020.10
 % =========================================================
 
-function [U, normOfW, TimeICGN] = funGlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol)
+function [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol,maxIter)
 
 
 coordinatesFEM = DICmesh.coordinatesFEM;
@@ -24,6 +24,7 @@ DIM = 2; % Problem dimension
 winsize = (coordinatesFEM(2,1)-coordinatesFEM(1,1))*ones(1,DIM); % or: DICpara.winsize;
 FEMSize = DIM*size(coordinatesFEM,1); % FEM problem size
 DfDx = Df.DfDx; DfDy = Df.DfDy; DfAxis = Df.DfAxis; DfDxStartx = DfAxis(1); DfDxStarty = DfAxis(3); 
+try maxIter = maxIter; catch maxIter = 100; end % set max iteration number as 100 by default
 
  
 %% ============================================================== 
@@ -46,7 +47,7 @@ DfDx = Df.DfDx; DfDy = Df.DfDy; DfAxis = Df.DfAxis; DfDxStartx = DfAxis(1); DfDx
      
 
 %% %%%%%%%%%%%%%% Start FE ICGN iteration %%%%%%%%%%%%%%% 
-for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
+for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by default
      
     tic;  
     
@@ -70,7 +71,7 @@ for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
          
     hbar = waitbar(0,['Global ICGN iteration step ',num2str(stepwithinwhile)]);
     % ============= Each element, assemble stiffness matrix ============
-    for indEle = 1: size(elementsFEM,1) % indEle is the element index
+    for indEle = 1 : size(elementsFEM,1) % indEle is the element index
         
         waitbar(indEle/size(elementsFEM,1));  
         
@@ -82,7 +83,7 @@ for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
         pt3x = coordinatesFEM(elementsFEM(indEle,3),1); pt3y = coordinatesFEM(elementsFEM(indEle,3),2);
         pt4x = coordinatesFEM(elementsFEM(indEle,4),1); pt4y = coordinatesFEM(elementsFEM(indEle,4),2);
          
-        % ------ Find the element nodal indices ------
+        % ------ Find element nodal indices ------
         tp = ones(1,DIM); tempIndexU = DIM*elementsFEM(indEle,[tp,2*tp,3*tp,4*tp]);
         for tempDIM = 1:DIM-1
             tempIndexU(tempDIM:DIM:end) = tempIndexU(tempDIM:DIM:end)-(DIM-tempDIM);
@@ -91,7 +92,7 @@ for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
         % tempIndexU = [2*elementsFEM(indEle,1)-1 2*elementsFEM(indEle,1) 2*elementsFEM(indEle,2)-1 2*elementsFEM(indEle,2)...
         %               2*elementsFEM(indEle,3)-1 2*elementsFEM(indEle,3) 2*elementsFEM(indEle,4)-1 2*elementsFEM(indEle,4)];
         
-        [ptOfxAll, ptOfyAll] = ndgrid(pt1x:pt3x, pt1y:pt3y); % To compute each pixels
+        [ptOfxAll, ptOfyAll] = ndgrid(pt1x:pt3x, pt1y:pt3y); % To compute at each pixels
         
         tempUMat = zeros(winsize+ones(1,2)); tempVMat = tempUMat;
         for tempk = 1:NodesPerEle % Compute affine deformations for all the pixels within the finite element
@@ -196,7 +197,7 @@ for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
     
     normW = norm(W)/sqrt(size(W,1)); 
     normOfW(stepwithinwhile) = normW;
-    TimeICGN(stepwithinwhile) = toc; 
+    timeICGN(stepwithinwhile) = toc; 
     U = reshape(U,length(U),1); W = reshape(W,length(W),1);
     
     disp(['normW = ',num2str(normW),' at iter ',num2str(stepwithinwhile),'; time cost = ',num2str(toc),'s']);
@@ -220,7 +221,7 @@ for stepwithinwhile = 1:100 % Max iteration number is set to be 100 by default
     
 end 
    
-TotalTimeICGN = sum(TimeICGN);
+TotalTimeICGN = sum(timeICGN);
 disp(['Elapsed time is ',num2str(TotalTimeICGN),' seconds.']);
 
 end

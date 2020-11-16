@@ -1,8 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Object: compute strain field FE-based global DIC results %
+% Compute strain field in the FE-based global DIC method   %
 % Author: Jin Yang                                         %
 % Last date modified: 2019.03; 2020.10                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function [F] = funGlobal_NodalStrainAvg(DICmesh,U,GaussPtOrder)
 
 coordinatesFEM = DICmesh.coordinatesFEM; 
@@ -12,6 +13,7 @@ DIM = 2; NodesPerEle = 4; GaussPtOrder = 2;
 FStrainAvgTimes = zeros(NodesPerEle*size(coordinatesFEM,1),1);
 FStrain = zeros(NodesPerEle*size(coordinatesFEM,1),1);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 for j = 1:size(elementsFEM,1) % j is the element index
     
     StrainWithinEachElementGausspoint = zeros(4,4);
@@ -26,7 +28,7 @@ for j = 1:size(elementsFEM,1) % j is the element index
     pt4x = coordinatesFEM(elementsFEM(j,4),1);
     pt4y = coordinatesFEM(elementsFEM(j,4),2);
     
-    % ------ Find the element nodal indices ------
+    % ------ Find element nodal indices ------
     temp = [2*elementsFEM(j,1)-1 2*elementsFEM(j,1) 2*elementsFEM(j,2)-1 2*elementsFEM(j,2)...
         2*elementsFEM(j,3)-1 2*elementsFEM(j,3) 2*elementsFEM(j,4)-1 2*elementsFEM(j,4)];
     
