@@ -46,7 +46,7 @@ for ImgSeqNum = 2:length(ImgNormalized)
     disp(['Current image frame #: ', num2str(ImgSeqNum),'/',num2str(length(ImgNormalized))]); fprintf('\n');
     
     %% Section 3:
-    
+    fprintf('------------ Section 3 Start ------------ \n')
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % This section is to find or update initial guess for ALDIC
     % The key idea is to either to use FFT peak fitting, or use last frame
