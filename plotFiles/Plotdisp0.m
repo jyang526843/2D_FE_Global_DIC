@@ -6,16 +6,8 @@ u = reshape(u,M,N); v = reshape(v,M,N);
 u = u'; v = v'; x= x'; y = y'; M = size(x,1); N = size(x,2);
 
 % imagesc([x(1,1) x(end,1)], [y(1,1) y(1,end)], flipud(g)); hold on;
-if M < 9 
-    x2 = x(:,1)';
-else  
-    x2 = interp(x(:,1)',4);
-end
-if N < 9
-    y2 = y(1,:);
-else
-	y2 = interp(y(1,:),4);
-end
+if M < 9, x2 = x(:,1)'; else x2 = linspace(x(1,1),x(end,1),4*(length(x(:,1))-1)+1); x2=x2(:)'; end  
+if N < 9, y2 = y(1,:); else y2 = linspace(y(1,1),y(1,end),4*(length(y(1,:))-1)+1); y2=y2(:)'; end  
 
 
 z = gridfit(reshape(x,M*N,1),reshape(y,M*N,1),reshape(u,M*N,1),x2,y2);
