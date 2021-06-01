@@ -1,7 +1,16 @@
-%% Correct and Smooth initial displacements
-function U0 = Init(u,v,Phi,x,y,index)
+function U0 =Init(u,v,Phi,x,y,index)
+%FUNCTION U0 =Init(u,v,Phi,x,y,index)
+% ----------------------------------------------
+% Remove outliers and smooth initial displacements
 
-% in inpaint_nans part, I use Spring Model for u and v initial guesses
+% ----------------------------------------------
+% Author: Jin Yang.  
+% Contact and support: jyang526@wisc.edu -or- aldicdvc@gmail.com
+% Last time updated: 02/2020.
+% ==============================================
+ 
+%% inpaint_nans: I use a Spring Model for u and v initial guesses
+u = inpaint_nans(u,4); v = inpaint_nans(v,4);
 uInit = u; vInit = v; 
 % threshod = 0.5;
 % [row, col] = find(Phi>2*(1-threshod));
@@ -168,3 +177,5 @@ end
 disp('Finish setting up mesh and assigning initial value!')
  
 U0 = U000;
+
+

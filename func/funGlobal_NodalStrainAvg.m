@@ -1,36 +1,51 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute strain field in the FE-based global DIC method   %
-% Author: Jin Yang                                         %
-% Last date modified: 2019.03; 2020.10                              %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [StrainNodalPt] = funGlobal_NodalStrainAvg(coordinatesFEM,elementsFEM,U,GaussPtOrder)
+%FUNCTION [StrainNodalPt] = funGlobal_NodalStrainAvg(coordinatesFEM,elementsFEM,U,GaussPtOrder))                 
+% Object: to compute strain fields by the FE-method
+% ----------------------------------------------
+%
+%	INPUT: coordinatesFEM      DIC FE Q4 mesh coordinates 
+%          elementsFEM         DIC FE Q4 mesh elements 
+%          U                   Disp vector: U = [Ux_node1, Uy_node1, ... , Ux_nodeN, Uy_nodeN]';
+%          GaussPtOrder        Gauss point order used in FE Q4 element,  GaussPtOrder = 2 BY DEFAULT
+%            
+%   OUTPUT: StrainNodalPt      Solved strains at the nodal points,
+%   
+%            
+% ----------------------------------------------
+% Reference
+% [1] RegularizeNd. Matlab File Exchange open source. 
+% https://www.mathworks.com/matlabcentral/fileexchange/61436-regularizend
+% [2] Gridfit. Matlab File Exchange open source. 
+% https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit
+% ----------------------------------------------
+% Author: Jin Yang.  
+% Contact and support: jyang526@wisc.edu -or- aldicdvc@gmail.com
+% Last time updated: 2018.03, 2020.12 
+% ==============================================
 
-function [F] = funGlobal_NodalStrainAvg(DICmesh,U,GaussPtOrder)
 
-coordinatesFEM = DICmesh.coordinatesFEM; 
-elementsFEM = DICmesh.elementsFEM;
-DIM = 2; NodesPerEle = 4; GaussPtOrder = 2;
+%% Initialization
+FStrainAvgTimes = zeros(4*size(coordinatesFEM,1),1);
+FStrain = zeros(4*size(coordinatesFEM,1),1);
 
-FStrainAvgTimes = zeros(NodesPerEle*size(coordinatesFEM,1),1);
-FStrain = zeros(NodesPerEle*size(coordinatesFEM,1),1);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-for j = 1:size(elementsFEM,1) % j is the element index
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for eleInd = 1:size(elementsFEM,1) % eleInd is the element index
     
     StrainWithinEachElementGausspoint = zeros(4,4);
     
     % ----- Find four corner points -------
-    pt1x = coordinatesFEM(elementsFEM(j,1),1);
-    pt1y = coordinatesFEM(elementsFEM(j,1),2);
-    pt2x = coordinatesFEM(elementsFEM(j,2),1);
-    pt2y = coordinatesFEM(elementsFEM(j,2),2);
-    pt3x = coordinatesFEM(elementsFEM(j,3),1);
-    pt3y = coordinatesFEM(elementsFEM(j,3),2);
-    pt4x = coordinatesFEM(elementsFEM(j,4),1);
-    pt4y = coordinatesFEM(elementsFEM(j,4),2);
+    pt1x = coordinatesFEM(elementsFEM(eleInd,1),1);
+    pt1y = coordinatesFEM(elementsFEM(eleInd,1),2);
+    pt2x = coordinatesFEM(elementsFEM(eleInd,2),1);
+    pt2y = coordinatesFEM(elementsFEM(eleInd,2),2);
+    pt3x = coordinatesFEM(elementsFEM(eleInd,3),1);
+    pt3y = coordinatesFEM(elementsFEM(eleInd,3),2);
+    pt4x = coordinatesFEM(elementsFEM(eleInd,4),1);
+    pt4y = coordinatesFEM(elementsFEM(eleInd,4),2);
     
-    % ------ Find element nodal indices ------
-    temp = [2*elementsFEM(j,1)-1 2*elementsFEM(j,1) 2*elementsFEM(j,2)-1 2*elementsFEM(j,2)...
-        2*elementsFEM(j,3)-1 2*elementsFEM(j,3) 2*elementsFEM(j,4)-1 2*elementsFEM(j,4)];
+    % ------ Find the element nodal indices ------
+    tempIndexU = 2*elementsFEM(eleInd,[1,1,2,2,3,3,4,4]);
+    tempIndexU(1:2:end) = tempIndexU(1:2:end)-1;
     
     % ------ Four Gauss points ------
     for tempi = 1:2
@@ -79,66 +94,36 @@ for j = 1:size(elementsFEM,1) % j is the element index
                 0 funDN1Dksi(ksi,eta) 0 funDN2Dksi(ksi,eta) 0 funDN3Dksi(ksi,eta) 0 funDN4Dksi(ksi,eta);
                 0 funDN1Deta(ksi,eta) 0 funDN2Deta(ksi,eta) 0 funDN3Deta(ksi,eta) 0 funDN4Deta(ksi,eta)];
             
-            StrainWithinEachElementGausspoint(2*(tempi-1)+tempj,1:4) = DN*U(temp);
+            StrainWithinEachElementGausspoint(2*(tempi-1)+tempj,1:4) = DN*U(tempIndexU);
             
             
         end
     end
     
-    %% Extrapolation to strains at nodal points using Gauss points
     
-    MatrixExtrapolation = [1+0.5*sqrt(3) -0.5 1-0.5*sqrt(3) -0.5;
-                            -0.5 1+0.5*sqrt(3) -0.5 1-0.5*sqrt(3);
-                            1-0.5*sqrt(3) -0.5 1+0.5*sqrt(3) -0.5;
-                            -0.5 1-0.5*sqrt(3) -0.5 1+0.5*sqrt(3)];
-                        
+    % ------ Extrapolation matrix ------
+    MatrixExtrapolation = [ 1+0.5*sqrt(3),   -0.5,            1-0.5*sqrt(3),   -0.5;
+                            -0.5,            1+0.5*sqrt(3),   -0.5,            1-0.5*sqrt(3);
+                            1-0.5*sqrt(3),   -0.5,            1+0.5*sqrt(3),   -0.5;
+                            -0.5,            1-0.5*sqrt(3),   -0.5,            1+0.5*sqrt(3)];
+    
     % ------ Nodal points strain extrapolation using Gauss points -----
-    StrainExxWithinEachElementNodalpoint =  MatrixExtrapolation * [StrainWithinEachElementGausspoint(1,1);
-        StrainWithinEachElementGausspoint(2,1);
-        StrainWithinEachElementGausspoint(3,1);
-        StrainWithinEachElementGausspoint(4,1)];
-    
-    StrainExyWithinEachElementNodalpoint = MatrixExtrapolation * [StrainWithinEachElementGausspoint(1,2);
-        StrainWithinEachElementGausspoint(2,2);
-        StrainWithinEachElementGausspoint(3,2);
-        StrainWithinEachElementGausspoint(4,2)];
-    
-    StrainEyxWithinEachElementNodalpoint = MatrixExtrapolation * [StrainWithinEachElementGausspoint(1,3);
-        StrainWithinEachElementGausspoint(2,3);
-        StrainWithinEachElementGausspoint(3,3);
-        StrainWithinEachElementGausspoint(4,3)];
-    
-    StrainEyyWithinEachElementNodalpoint = MatrixExtrapolation * [StrainWithinEachElementGausspoint(1,4);
-        StrainWithinEachElementGausspoint(2,4);
-        StrainWithinEachElementGausspoint(3,4);
-        StrainWithinEachElementGausspoint(4,4)];
-    
-    StrainWithinEachElementGausspoint(1,1) = StrainExxWithinEachElementNodalpoint(1);
-    StrainWithinEachElementGausspoint(2,1) = StrainExxWithinEachElementNodalpoint(2);
-    StrainWithinEachElementGausspoint(3,1) = StrainExxWithinEachElementNodalpoint(3);
-    StrainWithinEachElementGausspoint(4,1) = StrainExxWithinEachElementNodalpoint(4);
-    
-    StrainWithinEachElementGausspoint(1,2) = StrainExyWithinEachElementNodalpoint(1);
-    StrainWithinEachElementGausspoint(2,2) = StrainExyWithinEachElementNodalpoint(2);
-    StrainWithinEachElementGausspoint(3,2) = StrainExyWithinEachElementNodalpoint(3);
-    StrainWithinEachElementGausspoint(4,2) = StrainExyWithinEachElementNodalpoint(4);
-    
-    StrainWithinEachElementGausspoint(1,3) = StrainEyxWithinEachElementNodalpoint(1);
-    StrainWithinEachElementGausspoint(2,3) = StrainEyxWithinEachElementNodalpoint(2);
-    StrainWithinEachElementGausspoint(3,3) = StrainEyxWithinEachElementNodalpoint(3);
-    StrainWithinEachElementGausspoint(4,3) = StrainEyxWithinEachElementNodalpoint(4);
-    
-    StrainWithinEachElementGausspoint(1,4) = StrainEyyWithinEachElementNodalpoint(1);
-    StrainWithinEachElementGausspoint(2,4) = StrainEyyWithinEachElementNodalpoint(2);
-    StrainWithinEachElementGausspoint(3,4) = StrainEyyWithinEachElementNodalpoint(3);
-    StrainWithinEachElementGausspoint(4,4) = StrainEyyWithinEachElementNodalpoint(4);
-    
+    StrainExxWithinEachElementNodalpoint = MatrixExtrapolation * StrainWithinEachElementGausspoint(1:4,1);
+    StrainExyWithinEachElementNodalpoint = MatrixExtrapolation * StrainWithinEachElementGausspoint(1:4,2); 
+    StrainEyxWithinEachElementNodalpoint = MatrixExtrapolation * StrainWithinEachElementGausspoint(1:4,3);
+    StrainEyyWithinEachElementNodalpoint = MatrixExtrapolation * StrainWithinEachElementGausspoint(1:4,4);
+             
+    StrainWithinEachElementGausspoint(1:4,1) = reshape(StrainExxWithinEachElementNodalpoint(1:4),4,1);
+    StrainWithinEachElementGausspoint(1:4,2) = reshape(StrainExyWithinEachElementNodalpoint(1:4),4,1);
+    StrainWithinEachElementGausspoint(1:4,3) = reshape(StrainEyxWithinEachElementNodalpoint(1:4),4,1);
+    StrainWithinEachElementGausspoint(1:4,4) = reshape(StrainEyyWithinEachElementNodalpoint(1:4),4,1);
+     
     
     % ------ Find the element nodal indices for strain ------
-    tempStrainIndex = [4*elementsFEM(j,1)-3 4*elementsFEM(j,1)-2  4*elementsFEM(j,1)-1 4*elementsFEM(j,1)  ...
-        4*elementsFEM(j,2)-3 4*elementsFEM(j,2)-2  4*elementsFEM(j,2)-1 4*elementsFEM(j,2) ...
-        4*elementsFEM(j,3)-3 4*elementsFEM(j,3)-2  4*elementsFEM(j,3)-1 4*elementsFEM(j,3) ...
-        4*elementsFEM(j,4)-3 4*elementsFEM(j,4)-2  4*elementsFEM(j,4)-1 4*elementsFEM(j,4)];
+    tempStrainIndex = [ 4*elementsFEM(eleInd,1)-3 4*elementsFEM(eleInd,1)-2  4*elementsFEM(eleInd,1)-1 4*elementsFEM(eleInd,1)  ...
+                        4*elementsFEM(eleInd,2)-3 4*elementsFEM(eleInd,2)-2  4*elementsFEM(eleInd,2)-1 4*elementsFEM(eleInd,2) ...
+                        4*elementsFEM(eleInd,3)-3 4*elementsFEM(eleInd,3)-2  4*elementsFEM(eleInd,3)-1 4*elementsFEM(eleInd,3) ...
+                        4*elementsFEM(eleInd,4)-3 4*elementsFEM(eleInd,4)-2  4*elementsFEM(eleInd,4)-1 4*elementsFEM(eleInd,4)];
     
     
     FStrain(tempStrainIndex) = FStrain(tempStrainIndex)+[StrainWithinEachElementGausspoint(1,1);
@@ -153,42 +138,39 @@ for j = 1:size(elementsFEM,1) % j is the element index
     
     FStrainAvgTimes(tempStrainIndex) = FStrainAvgTimes(tempStrainIndex) + ones(16,1);
     
-    
-    
-    
+     
 end
+ 
+StrainNodalPt = FStrain./FStrainAvgTimes;
 
 
-F = FStrain./FStrainAvgTimes;
-                       
 end
+            
 
 
-% ========= subroutines for  FEM Q4 shape function derivatives ========
-
+%% ========= subroutines for FEM Q4 shape function derivatives ========
 function DN1Dksi=funDN1Dksi(ksi,eta)
-DN1Dksi = -(1-eta)/4 ;
+    DN1Dksi = -(1-eta)/4 ;
 end
 function DN1Deta=funDN1Deta(ksi,eta)
-DN1Deta =  -(1-ksi)/4 ;
+    DN1Deta =  -(1-ksi)/4 ;
 end
 function DN2Dksi=funDN2Dksi(ksi,eta)
-DN2Dksi =  (1-eta)/4 ;
+    DN2Dksi =  (1-eta)/4 ;
 end
 function DN2Deta=funDN2Deta(ksi,eta)
-DN2Deta =  -(1+ksi)/4 ;
+    DN2Deta =  -(1+ksi)/4 ;
 end
 function DN3Dksi=funDN3Dksi(ksi,eta)
-DN3Dksi = (1+eta)/4 ;
+    DN3Dksi = (1+eta)/4 ;
 end
 function DN3Deta=funDN3Deta(ksi,eta)
-DN3Deta =  (1+ksi)/4 ;
+    DN3Deta =  (1+ksi)/4 ;
 end
 function DN4Dksi=funDN4Dksi(ksi,eta)
-DN4Dksi = -(1+eta)/4 ;
+    DN4Dksi = -(1+eta)/4 ;
 end
 function DN4Deta=funDN4Deta(ksi,eta)
-DN4Deta = (1-ksi)/4 ;    
+    DN4Deta = (1-ksi)/4 ;
 end
-
 

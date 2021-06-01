@@ -1,6 +1,21 @@
-%% FEM Mesh Set Up
 function DICmesh = MeshSetUp(x,y,DICpara)
+%FUNCTION DICmesh = MeshSetUp(x,y,DICpara)
+% Objective: To set up a DIC uniform FE-mesh  
+% ----------------------------------------------
+%
+%   INPUT: x,y      DIC subsets positions
+%          DICpara  DIC parameters
+%
+%   OUTPUT: DICmesh Generated DIC FE-mesh {coordinatesFEM, elementsFEM, ...}
+%
+% ----------------------------------------------
+% Author: Jin Yang.  
+% Contact and support: jyang526@wisc.edu -or- aldicdvc@gmail.com
+% Last time updated: 02/2020.
+% ==============================================
 
+
+%% Initialization
 winstepsize = DICpara.winstepsize;
 ImgSize = DICpara.ImgSize;
 

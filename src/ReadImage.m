@@ -1,15 +1,26 @@
-% ==============================================
-% function ReadImage
-% ----------------------------------------------
-%   This function is to load DIC images
-%   Images can be loaded by selecting images folder, inputing image name
-%   prefix, or directly selecting images manually.
-%
-% Author: Jin Yang.
-% Last updated 02/2020.
-% ==============================================
 function [file_name,Img,DICpara] = ReadImage(varargin)
+%FUNCTION [file_name,Img,DICpara] = ReadImage(varargin)
+% MATLAB script: ReadImage.m
+% ----------------------------------------------
+%   This script is to load DIC images 
+%   Images can be loaded by:
+%       i) selecting a folder which included all the DIC raw images, 
+%       ii) inputing image file name prefix keywords
+%       iii) manually select DIC raw images
+%
+%   INPUT: No inputs are needed
+%
+%   OUTPUT: file_name    Loaded DIC raw image file name
+%           Img          Loaded DIC images
+%           DICpara      DIC parameters
+%
+% ----------------------------------------------
+% Author: Jin Yang.  
+% Contact and support: jyang526@wisc.edu -or- aldicdvc@gmail.com
+% Last time updated: 02/2020.
+% ==============================================
 
+%%
 fprintf('Choose method to load images:  \n')
 fprintf('     0: Select images folder;  \n')
 fprintf('     1: Use prefix of image names;  \n')
@@ -69,19 +80,8 @@ for i = 1:numImages
 end
 
 
-%f = imread(file_name{1});
-%g = imread(file_name{2});
-
-% % Decide rgb images or grayscale images
-%if (numberOfColorChannels==3)
-%    f = rgb2gray(f);
-%    g = rgb2gray(g);
-%end
-
-% % Field of the undeformed and deformed greyscale;
-%f = double(f'); g = double(g');
-
-% images are:
+% ====== COMMENT ======
+% Images physical world coordinates and image coordinates are different:
 % --------------------
 % --  This is image --
 % |                  |
@@ -116,13 +116,22 @@ fprintf('Coordinates of bottom-right corner point are (%4.3f,%4.3f)\n',gridx(2),
 
 gridxy.gridx = round(gridx); gridxy.gridy = round(gridy);
 
-% Choose subset size
+% Choose finite element size
 fprintf('\n');
-fprintf('--- What is the finite element size? --- \n');
-prompt = 'Input here: ';
+fprintf('--- What is the finite element size (unit: px) ? --- \n');
+prompt = 'Input an integer number: ';
 winstepsize = input(prompt);
+winsize = 2*ceil(winstepsize/2);
+ 
 
-winsize = winstepsize + 10;
+% ==============================================
+% Subproblem 2 solver: finite difference or finite element
+Subpb2FDOrFEM = 2; % By default initialize parameters
+% Subpb2FDOrFEM = funParaInput('Subpb2FDOrFEM'); % Subproblem 2 using finite difference or fem?
+
+% ==============================================
+% Parallel cluster #
+% ClusterNo = funParaInput('ClusterNo'); % Assign parpool cluster No
  
 % ==============================================
 % Deal with image sequence
@@ -182,6 +191,10 @@ DICpara.gridxyROIRange = gridxy;
 DICpara.LoadImgMethod = LoadImgMethod;
 DICpara.ImgSeqIncUnit = ImgSeqIncUnit;
 DICpara.ImgSeqIncROIUpdateOrNot = ImgSeqIncROIUpdateOrNot;
+DICpara.Subpb2FDOrFEM = Subpb2FDOrFEM;
+DICpara.NewFFTSearch = NewFFTSearch;
+% DICpara.ClusterNo = ClusterNo;
 DICpara.ImgSize = size(Img{1});
 
 end
+
