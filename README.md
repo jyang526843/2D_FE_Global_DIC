@@ -13,7 +13,11 @@ It is already included in the code. It's also available at my Researchgate: http
 
 ## Citation
 * [1] Yang, J. and Bhattacharya, K. Augmented Lagrangian Digital Image Correlation. Exp.Mech. 59: 187, 2018. https://doi.org/10.1007/s11340-018-00457-0.   or 
-* Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation  
+* Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation 
+
+* [2] Yang, J. and Bhattacharya, K. Combining Image Compression with Digital Image Correlation. Exp.Mech. 59: 629-642, 2019. https://doi.org/10.1007/s11340-018-00459-y  or 
+* Full text can be requested at: https://www.researchgate.net/publication/330489954_Combining_Image_Compression_with_Digital_Image_Correlation
+
 
 ## Contact and support
 Jin Yang (Caltech, solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
