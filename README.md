@@ -11,6 +11,17 @@ Welcome to give the 2D_FE_Global_DIC code ratings and comments in the MATLAB Fil
 ## Code Manual
 It is already included in the code. It's also available at my Researchgate: https://www.researchgate.net/publication/345907429_Finite_Element_Global_Digital_Image_Correlation_FE-Global-DIC_Code_Manual_v10
 
+## Code Demo
+2D_FE_Global_DIC MATLAB code demo is very similar to the ALDIC code: 
+% =========================================
+ALDIC Matlab code demo:
+(Youtube) https://www.youtube.com/watch?v=JctudMfO-7w
+(Bilibili) https://www.bilibili.com/video/BV1hf4y1i7bK/
+
+I also attach my EASF webinar to introduce AL-DIC/DVC algorithm and review other DIC/DVC methods:
+(Youtube) https://www.youtube.com/watch?v=-t61WrVagZ4
+(Bilibili) https://www.bilibili.com/video/BV1ff4y1B71L/
+
 ## Citation
 * [1] Yang, J. and Bhattacharya, K. Augmented Lagrangian Digital Image Correlation. Exp.Mech. 59: 187, 2018. https://doi.org/10.1007/s11340-018-00457-0.   or 
 * Full text can be requested at: www.researchgate.net/publication/329456141_Augmented_Lagrangian_Digital_Image_Correlation 
@@ -20,6 +31,7 @@ It is already included in the code. It's also available at my Researchgate: http
 
 
 ## Contact and support
+I appreciate your comments and ratings to help me further improve this code. If you have other questions, feel free to contact me.
 Jin Yang (Caltech, solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
 
 
