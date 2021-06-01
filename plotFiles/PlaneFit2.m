@@ -14,14 +14,16 @@ h=waitbar(0,'wait for PlaneFit2!');
         LSMatrix = ones((2*Rad+1)^2, 3);
         for tempj = -Rad:Rad
             for tempi = -Rad:Rad
-                LSMatrix((2*Rad+1)*(tempj+Rad)+tempi+Rad+1,:) = [1 tempi*winsizeOfx tempj*winsizeOfy];
+                LSMatrix((2*Rad+1)*(tempj+Rad)+tempi+Rad+1,:) = ...
+                    [1 tempi*winsizeOfx tempj*winsizeOfy];
             end
         end
 
         LSb = zeros((2*Rad+1)^2, 1);
         for tempj = -Rad:Rad
             for tempi = -Rad:Rad
-                LSb((2*Rad+1)*(tempj+Rad)+tempi+Rad+1,:) = U(ii+tempi, jj+tempj);
+                LSb((2*Rad+1)*(tempj+Rad)+tempi+Rad+1,:) = ...
+                    U(ii+tempi, jj+tempj);
             end
         end
          

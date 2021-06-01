@@ -4,7 +4,7 @@
 % Find img name
 [~,imgname,imgext] = fileparts(file_name{1,ImgSeqNum});
 
-
+%%
 if DICpara.MethodToSaveFig == 1
     %% jpg
     figure(3); if DICpara.OrigDICImgTransparency == 0, colormap jet; caxis auto; end
@@ -14,34 +14,24 @@ if DICpara.MethodToSaveFig == 1
     caxis auto; print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_DispV'],'-djpeg','-r300');
     
     figure(5); if DICpara.OrigDICImgTransparency == 0, colormap jet; caxis([-0.025,0.025]); end
-    caxis auto; %caxis([-0.03,0.06]); %TODO: manually modify caxis
-    caxis([-0.025,0.065]);
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_exx'],'-djpeg','-r300')
     
     figure(6); if DICpara.OrigDICImgTransparency == 0, colormap jet; caxis([-0.025,0.025]); end
-    caxis auto; %caxis([-0.04,0.04]); %TODO: manually modify caxis
-    caxis([-0.04,0.04]);
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_exy'],'-djpeg','-r300')
     
     figure(7); if DICpara.OrigDICImgTransparency == 0, colormap jet; caxis([-0.015,0.015]); end
-    caxis auto; %caxis([-0.025,0.025]); %TODO: manually modify caxis
-    caxis([-0.025,0.025]);
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_eyy'],'-djpeg','-r300')
     
     figure(8); if DICpara.OrigDICImgTransparency == 0, colormap jet;  caxis([0,0.025]); end
-    caxis auto; %caxis([0,0.04]); %TODO: manually modify caxis
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_principalstrain_max'],'-djpeg','-r300')
     
     figure(9); if DICpara.OrigDICImgTransparency == 0, colormap jet;  caxis([-0.025,0]); end
-    caxis auto; %caxis([0,0.04]); %TODO: manually modify caxis
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_principalstrain_min'],'-djpeg','-r300')
     
     figure(10); if DICpara.OrigDICImgTransparency == 0, colormap jet;  caxis([0,0.07]); end
-    caxis auto; %caxis([0,0.04]); %TODO: manually modify caxis
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_maxshear'],'-djpeg','-r300')
     
     figure(11); if DICpara.OrigDICImgTransparency == 0, colormap jet;  caxis([0,0.07]); end
-    caxis auto; %caxis([0,0.04]); %TODO: manually modify caxis
     print([imgname,'_WS',num2str(DICpara.winsize),'_ST',num2str(DICpara.winstepsize),'_vonMises_strain'],'-djpeg','-r300')
     
     
