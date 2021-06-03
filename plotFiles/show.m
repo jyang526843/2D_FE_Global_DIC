@@ -14,6 +14,7 @@ end
 % trisurf(elements3,coordinates(:,1),coordinates(:,2),u',...
 % 'facecolor','interp' )
 % hold on
+
 Trix = zeros(3,size(elements3,1)); Triy = zeros(3,size(elements3,1)); Tric = zeros(3,size(elements3,1));
 for j = 1:size(elements3,1)
     Trix(1:3,j) = coordinates(elements3(j,1:3),1);
@@ -21,9 +22,11 @@ for j = 1:size(elements3,1)
     Tric(1:3,j) = u(elements3(j,1:3));
 end
 if size(elements3,1) > 2e4 || strcmp(edgeColorOrNot,'NoEdgeColor')==1
-    h=patch(Trix,Triy,Tric,'facecolor','interp','edgecolor','none'); 
+     h=patch(Trix,Triy,Tric,'facecolor','interp','edgecolor','none'); 
+     
 else
     h=patch(Trix,Triy,Tric,'facecolor','interp');
+    
 end
     
 hold on;
@@ -38,7 +41,8 @@ for j = 1:size(elements4,1)
     Sqc(1:4,j) = u(elements4(j,1:4));
 end
 if size(elements4,1) > 2e4 || strcmp(edgeColorOrNot,'NoEdgeColor')==1
-    h=patch(Sqx,Sqy,Sqc,'facecolor','interp','edgecolor','none'); 
+     h=patch(Sqx,Sqy,Sqc,'facecolor','interp','edgecolor','none' ); 
+     
 else
     h=patch(Sqx,Sqy,Sqc,'facecolor','interp'); 
 end

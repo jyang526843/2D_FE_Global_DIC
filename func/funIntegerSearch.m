@@ -58,6 +58,7 @@ switch tempNoOfInitPt % 0- whole field; 1- several seeds points;
                 uSeedPt(tempi) = u1temp-zero_disp(1);
                 vSeedPt(tempi) = v1temp-zero_disp(2);
                 PhiSeedPt(tempi) = max_f;
+                
             end
             
         end
