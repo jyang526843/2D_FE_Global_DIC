@@ -28,7 +28,7 @@ I also attach my EASF webinar to introduce AL-DIC/DVC algorithm and review other
 
 * [2] Yang, J. and Bhattacharya, K. Combining Image Compression with Digital Image Correlation. Exp.Mech. 59: 629-642, 2019. https://doi.org/10.1007/s11340-018-00459-y  or 
 * Full text can be requested at: https://www.researchgate.net/publication/330489954_Combining_Image_Compression_with_Digital_Image_Correlation
-* 
+
 * [3] Augmented Lagrangian Digital Image Correlation MATLAB code:  https://www.mathworks.com/matlabcentral/fileexchange/70499-augmented-lagrangian-digital-image-correlation-and-tracking
 
 ## Contact and support
