@@ -69,7 +69,7 @@ switch DICpara.MethodToComputeStrain
     case 0 % Finite element method
         
         GaussPtOrder = 2; [FStrain] = funGlobal_NodalStrainAvg(coordinatesFEM,elementsFEM,USubpb2,GaussPtOrder);
-        Rad = 1;  
+        Rad = 0;  
         
         % Find coordinatesFEM that belong to (x(Rad+1:M-Rad,Rad+1:N-Rad),y(Rad+1:M-Rad,Rad+1:N-Rad))
         % temp = 1:1:size(coordinatesFEM,1); temp = temp';
