@@ -13,10 +13,12 @@ It is already included in the code. It's also available at my Researchgate: http
 
 ## Code Demo
 2D_FE_Global_DIC MATLAB code demo is very similar to the ALDIC code: 
+
 % =========================================
 ALDIC Matlab code demo:
 (Youtube) https://www.youtube.com/watch?v=JctudMfO-7w
 (Bilibili) https://www.bilibili.com/video/BV1hf4y1i7bK/
+
 
 I also attach my EASF webinar to introduce AL-DIC/DVC algorithm and review other DIC/DVC methods:
 (Youtube) https://www.youtube.com/watch?v=-t61WrVagZ4
