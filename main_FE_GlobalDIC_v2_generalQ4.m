@@ -324,26 +324,26 @@ for ImgSeqNum = 2 : length(ImgNormalized)
     if DICpara.OrigDICImgTransparency == 1
         Plotdisp_show(UWorld,coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),DICpara,'NoEdgeColor');
         [strain_exx,strain_exy,strain_eyy,strain_principal_max,strain_principal_min,strain_maxshear,strain_vonMises] = ...
-                   Plotstrain0Quadtree(FStraintemp,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),DICpara);
+                   Plotstrain0Quadtree(FStraintemp,coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),DICpara);
     
     else % Plot over raw DIC images
         if DICpara.Image2PlotResults == 0 % Plot over the first image; "file_name{1,1}" corresponds to the first image
  
-            PlotdispQuadtree(UWorld,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),...
+            PlotdispQuadtree(UWorld,coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),...
                 file_name{1,1},DICpara);
             
             [strain_exx,strain_exy,strain_eyy,strain_principal_max,strain_principal_min, ...
                 strain_maxshear,strain_vonMises] = PlotstrainQuadtree(UWorld,FStraintemp, ...
-                DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),file_name{1,1},DICpara);
+                coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),file_name{1,1},DICpara);
          
         else % Plot over second or next deformed images
             
-            PlotdispQuadtree(UWorld,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),...
+            PlotdispQuadtree(UWorld,coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),...
                 file_name{1,ImgSeqNum},DICpara);
             
             [strain_exx,strain_exy,strain_eyy,strain_principal_max,strain_principal_min, ...
                 strain_maxshear,strain_vonMises] = PlotstrainQuadtree(UWorld,FStraintemp, ...
-                DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),file_name{1,ImgSeqNum},DICpara);
+                coordinatesFEMWorld,DICmesh.elementsFEM(:,1:4),file_name{1,ImgSeqNum},DICpara);
 
  
         end
