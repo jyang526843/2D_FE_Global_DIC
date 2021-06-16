@@ -30,7 +30,8 @@ fNormalized = ImgNormalized{1}; % Load the first referece image
 % ====== Initialize variable storage ======
 ResultDisp = cell(length(ImgNormalized)-1,1); 
 ResultDefGrad = cell(length(ImgNormalized)-1,1);
-ResultStrain = cell(length(ImgNormalized)-1,1);
+ResultStrainWorld = cell(length(ImgNormalized)-1,1);
+ResultStressWorld = cell(length(ImgNormalized)-1,1);
 ResultFEMesh = cell(ceil((length(ImgNormalized)-1)/DICpara.ImgSeqIncUnit),1); % For incremental DIC mode
 ResultFEMeshEachFrame = cell(length(ImgNormalized)-1,1); % Needs future improvment: to store FE-mesh for each frame
 ResultAlpha = cell(length(ImgNormalized)-1,1);
@@ -189,11 +190,12 @@ end
 
 
 % ------ Plot ------
+% Transform into the physical world coordinates
 UWorld = U; UWorld(2:2:end) = -U(2:2:end);
-FWorld = F; % Transform into the physical world coordinates
+FWorld = F; FWorld(2:4:end) = -F(2:4:end); FWorld(3:4:end) = -F(3:4:end); 
 close all; Plotuv(UWorld,DICmesh.x0,DICmesh.y0World); 
 Plotdisp_show(UWorld,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM);
-Plotstrain_show(F,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM);
+Plotstrain_show(FWorld,DICmesh.coordinatesFEMWorld,DICmesh.elementsFEM);
 
 
 %% ------ Save results ------
@@ -281,7 +283,7 @@ for ImgSeqNum = 2 : length(ImgNormalized)
     else
         ULocal = USubpb2; FLocal = FSubpb2;
     end
-    UWorld = DICpara.um2px*ULocal; UWorld(2:2:end) = -UWorld(2:2:end); FWorld = FLocal; % close all; Plotuv(UWorld,x0,y0World);
+    UWorld = DICpara.um2px*ULocal; UWorld(2:2:end) = -UWorld(2:2:end);  % close all; Plotuv(UWorld,x0,y0World);
     
     % ------ Smooth displacements ------
     %prompt = 'Do you want to smooth displacement? (0-yes; 1-no)';
@@ -297,36 +299,36 @@ for ImgSeqNum = 2 : length(ImgNormalized)
     end
      
     % ----- Compute strain field ------
-    ComputeStrain; % Compute strain
+    ComputeStrain; % Compute strain: run ComputeStrain.m
     % %%%%% Add filter and plot strain field %%%%%
     % %%%%% Plotstrain_Fij; %%%%%
     
     % ------ Plot disp and strain ------
-    close all; Plotuv(ULocal,x0,y0); 
+    close all; % Plotuv(ULocal,x0,y0); 
     
     if DICpara.OrigDICImgTransparency == 1
         Plotdisp_show(UWorld,coordinatesFEMWorld,elementsFEM,DICpara);
         [strainxCoord,strainyCoord,dispu,dispv,dudx,dvdx,dudy,dvdy,strain_exx,strain_exy,strain_eyy,strain_principal_max, ...
             strain_principal_min,strain_maxshear,strain_vonMises]  =  Plotstrain0( ...
-            UWorld,FStraintemp,Rad,x0World,y0World,size(ImgNormalized{1}),DICpara);
+            UWorld,FStrainWorld,Rad,x0World,y0World,size(ImgNormalized{1}),DICpara);
     
     else % Plot over raw DIC images
         if DICpara.Image2PlotResults == 0 % Plot over the first image; "file_name{1,1}" corresponds to the first image
             Plotdisp(UWorld,x0World,y0World,size(ImgNormalized{1}),file_name{1,1},DICpara);
             [strainxCoord,strainyCoord,dispu,dispv,dudx,dvdx,dudy,dvdy,strain_exx,strain_exy,strain_eyy,strain_principal_max, ...
                 strain_principal_min,strain_maxshear,strain_vonMises]  =  Plotstrain( ...
-                UWorld,FStraintemp,Rad,x0World,y0World,size(ImgNormalized{1}),file_name{1,1},DICpara);
+                UWorld,FStrainWorld,Rad,x0World,y0World,size(ImgNormalized{1}),file_name{1,1},DICpara);
         
         else % Plot over second or next deformed images
             Plotdisp(UWorld,x0World,y0World,size(ImgNormalized{1}),file_name{1,ImgSeqNum},DICpara);
             [strainxCoord,strainyCoord,dispu,dispv,dudx,dvdx,dudy,dvdy,strain_exx,strain_exy,strain_eyy,strain_principal_max, ...
                 strain_principal_min,strain_maxshear,strain_vonMises]  =  Plotstrain( ...
-                UWorld,FStraintemp,Rad,x0World,y0World,size(ImgNormalized{1}),file_name{1,ImgSeqNum},DICpara);
+                UWorld,FStrainWorld,Rad,x0World,y0World,size(ImgNormalized{1}),file_name{1,ImgSeqNum},DICpara);
         end
     end
     
     % ----- Save strain results ------
-    ResultStrain{ImgSeqNum-1} = struct('strainxCoord',strainxCoord,'strainyCoord',strainyCoord, ...
+    ResultStrainWorld{ImgSeqNum-1} = struct('strainxCoord',strainxCoord,'strainyCoord',strainyCoord, ...
         'dispu',dispu,'dispv',dispv,'dudx',dudx,'dvdx',dvdx,'dudy',dudy,'dvdy',dvdy, ...
         'strain_exx',strain_exx,'strain_exy',strain_exy,'strain_eyy',strain_eyy, ...
         'strain_principal_max',strain_principal_max,'strain_principal_min',strain_principal_min, ...
@@ -343,8 +345,8 @@ fprintf('------------ Section 5 Done ------------ \n \n')
 
 %% Save data again including stress solve method
 results_name = ['results_FE_globalDIC_',imgname,'_st',num2str(DICpara.winstepsize(1)),'_alpha',num2str(DICpara.alpha),'.mat'];
-save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrain', ...
-    'ResultFEMesh','ResultFEMeshEachFrame',...
+save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrainWorld', ...
+     'ResultFEMesh','ResultFEMeshEachFrame',...
      'ResultAlpha','ResultNormOfW','ResultTimeICGN');
  
 
@@ -375,20 +377,20 @@ for ImgSeqNum = 2 : length(ImgNormalized)
         [stress_sxx,stress_sxy,stress_syy, stress_principal_max_xyplane, ...
             stress_principal_min_xyplane, stress_maxshear_xyplane, ...
             stress_maxshear_xyz3d, stress_vonMises]  =  Plotstress0( ...
-            DICpara,ResultStrain{ImgSeqNum-1},size(ImgNormalized{1}));
+            DICpara,ResultStrainWorld{ImgSeqNum-1},size(ImgNormalized{1}));
         
     else % Plot over raw DIC images
         if DICpara.Image2PlotResults == 0 % Plot over the first image; "file_name{1,1}" corresponds to the first image
             [stress_sxx,stress_sxy,stress_syy, stress_principal_max_xyplane, ...
                 stress_principal_min_xyplane, stress_maxshear_xyplane, ...
                 stress_maxshear_xyz3d, stress_vonMises] = Plotstress( ...
-                DICpara,ResultStrain{ImgSeqNum-1},size(ImgNormalized{1}),file_name{1,1});
+                DICpara,ResultStrainWorld{ImgSeqNum-1},size(ImgNormalized{1}),file_name{1,1});
             
         else % Plot over second or next deformed images
             [stress_sxx,stress_sxy,stress_syy, stress_principal_max_xyplane, ...
                 stress_principal_min_xyplane, stress_maxshear_xyplane, ...
                 stress_maxshear_xyz3d, stress_vonMises] = Plotstress( ...
-                DICpara,ResultStrain{ImgSeqNum-1},size(ImgNormalized{1}),file_name{1,ImgSeqNum});
+                DICpara,ResultStrainWorld{ImgSeqNum-1},size(ImgNormalized{1}),file_name{1,ImgSeqNum});
             
         end
     end
@@ -398,7 +400,7 @@ for ImgSeqNum = 2 : length(ImgNormalized)
     SaveFigFilesStress;
     
     % ----- Save strain results ------
-    ResultStress{ImgSeqNum-1} = struct('stressxCoord',ResultStrain{ImgSeqNum-1}.strainxCoord,'stressyCoord',ResultStrain{ImgSeqNum-1}.strainyCoord, ...
+    ResultStressWorld{ImgSeqNum-1} = struct('stressxCoord',ResultStrainWorld{ImgSeqNum-1}.strainxCoord,'stressyCoord',ResultStrainWorld{ImgSeqNum-1}.strainyCoord, ...
         'stress_sxx',stress_sxx,'stress_sxy',stress_sxy,'stress_syy',stress_syy, ...
         'stress_principal_max_xyplane',stress_principal_max_xyplane, 'stress_principal_min_xyplane',stress_principal_min_xyplane, ...
         'stress_maxshear_xyplane',stress_maxshear_xyplane,'stress_maxshear_xyz3d',stress_maxshear_xyz3d, ...
@@ -412,7 +414,7 @@ fprintf('------------ Section 6 Done ------------ \n \n')
 
 %% Save data again including stress solve method
 results_name = ['results_FE_globalDIC_',imgname,'_st',num2str(DICpara.winstepsize(1)),'_alpha',num2str(DICpara.alpha),'.mat'];
-save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrain','ResultStress', ...
+save(results_name, 'file_name','DICpara','DICmesh','ResultDisp','ResultDefGrad','ResultStrainWorld','ResultStressWorld', ...
     'ResultFEMesh','ResultFEMeshEachFrame',...
      'ResultAlpha','ResultNormOfW','ResultTimeICGN');
 
