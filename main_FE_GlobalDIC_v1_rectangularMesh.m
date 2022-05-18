@@ -125,9 +125,9 @@ for ImgSeqNum = 2 : length(ImgNormalized)
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Finite element based global DIC iterations
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    DICpara.tol = 1e-3; % iteration stopping threshold 
-    DICpara.maxIter = 100; % Maximum IC-GN iterations in IC-GN iterations
-    DICpara.alpha = 10; % Set regularization coefficient, alpha, as 10
+    DICpara.tol = 1e-3;     % TODO: Iteration stopping threshold 
+    DICpara.maxIter = 100;  % TODO: Maximum IC-GN iterations in IC-GN iterations
+    DICpara.alpha = 10;     % TODO：Regularization coefficient, alpha, the default value is 10
     alphaList = DICpara.alpha;
     
     % ====== Tune regularization coefficient ======
