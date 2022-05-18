@@ -121,11 +121,10 @@ for tempi = 1:4:length(FStrain)
 
 end
 try
-FStraintemp = FStrainFinite(temp3);
+    FStraintemp = FStrainFinite(temp3);
 catch
     FStraintemp = FStrain;
 end
-
 
 FStrainWorld = FStraintemp; FStrainWorld(2:4:end) = -FStrainWorld(2:4:end); FStrainWorld(3:4:end) = -FStrainWorld(3:4:end); 
  
