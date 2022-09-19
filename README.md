@@ -51,7 +51,7 @@ Jin Yang (Caltech, solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@
   <img width="538" height="334" src="https://github.com/jyang526843/2D_FE_Global_DIC/blob/main/results_folder_Images12/fig1.png">
   </p>
   <p align="center">
-  <img width="538" height="769" src="https://github.com/jyang526843/2D_FE_Global_DIC/blob/main/results_folder_Images12/fig5.png">
+  <img width="538" height="769" src="https://github.com/jyang526843/2D_FE_Global_DIC/blob/main/results_folder_Images12/fig5.jpg">
   </p>
 
 
