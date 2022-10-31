@@ -61,7 +61,7 @@ function print2eps(name, fig, export_options, varargin)
 % 23/07/13: Bug fix to font swapping. Thanks to George for reporting the
 %           issue.
 % 13/08/13: Fix MATLAB feature of not exporting white lines correctly.
-%           Thanks to Sebastian Heﬂlinger for reporting it.
+%           Thanks to Sebastian He√ülinger for reporting it.
 % 24/02/15: Fix for Matlab R2014b bug (issue #31): LineWidths<0.75 are not
 %           set in the EPS (default line width is used)
 % 25/02/15: Fixed issue #32: BoundingBox problem caused uncropped EPS/PDF files

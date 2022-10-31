@@ -89,7 +89,8 @@ alpha(h2,OrigDICImgTransparency); colormap(jet); caxis auto;
 %%%%%% TODO: manually modify colormap and caxis %%%%%%
 % colormap(jet); caxis([0,0.5]) % D Sample 
 % colormap(jet); caxis([-0.1,0.02]) % foam
-% colormap(jet); caxis([-0.004,0]); % Sample 12
+% colormap(jet); caxis([-0.004,0]); % Sample 12 
+% colormap(jet(16)); caxis([-8e-3,0]); % Sample 12
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 linkaxes([ax1,ax2]);  % Link axes together
@@ -122,6 +123,7 @@ alpha(h2,OrigDICImgTransparency); colormap(jet); caxis auto;
 % colormap(jet); caxis([-0.08,0.08]) % D Sample 
 % colormap(jet); caxis([-0.06,0.06]) % foam
 % colormap(jet); caxis([-0.008,0.008]); % Sample 12 
+% colormap(jet(16)); caxis([-8e-3,8e-3]); % Sample 12
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 linkaxes([ax1,ax2]);  % Link axes together
@@ -154,6 +156,7 @@ alpha(h2,OrigDICImgTransparency); colormap(jet); caxis auto;
 % colormap(jet); caxis([-0.15,0]) % D Sample 
 % colormap(jet); caxis([-0.05,0.2]) % foam
 % colormap(jet); caxis([-0.002,0.017]); % Sample 12 
+% colormap(jet(16)); caxis([0,0.025]); % Sample 12
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 linkaxes([ax1,ax2]);  % Link axes together

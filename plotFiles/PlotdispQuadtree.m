@@ -56,9 +56,10 @@ set(gca,'fontSize',18); view(2); box on; axis equal;  axis tight;
 alpha(h2,OrigDICImgTransparency); colormap(cMap); caxis auto;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% TODO: manually modify colormap and caxis %%%%%%
-% colormap(cMap); %colormap(jet);  
+% colormap(cMap); % colormap(jet);  
 % caxis([-35,35]); % caxis([-0.025,0.025]); 
 % caxis([-1.3,-0.1]);
+% colormap(jet(16)); caxis([-1.4,0]); % Sample 12
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 linkaxes([ax1,ax2]);  % Link axes together
@@ -90,6 +91,7 @@ alpha(h2,OrigDICImgTransparency); colormap(cMap); caxis auto;
 % colormap(cMap); %colormap(jet);  
 % caxis([5,12]);
 % caxis([0,38]); % caxis([-0.025,0.025]); 
+% colormap(jet(16)); caxis([5,12]); % Sample 12
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 linkaxes([ax1,ax2]);  % Link axes together

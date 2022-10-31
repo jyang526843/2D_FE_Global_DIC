@@ -145,7 +145,7 @@ if numImages > 2
     % ==============================================
     % Decide DIC as accumulative or incremental mode?
     fprintf('--- Choose accumulative or incremental mode ---  \n')
-    fprintf('     0: Accumulative(By default);  \n')
+    fprintf('     0: Cumulative (by default);  \n')
     fprintf('     1: Incremental;  \n')
     prompt = 'Input here: ';
     DICIncOrNot = input(prompt);
@@ -161,7 +161,7 @@ if numImages > 2
                 ImgSeqIncUnit = input(prompt);
                 fprintf('Update ROI at the same time of updating reference image? \n');
                 fprintf('    0: Do not update ROI; \n'); 
-                fprintf('    1: Manually(Recommended); \n'); 
+                fprintf('    1: Manually (recommended); \n'); 
                 fprintf('    2: Automatically; \n'); 
                 prompt = 'Input here: ';
                 ImgSeqIncROIUpdateOrNot = input(prompt);
