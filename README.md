@@ -2,8 +2,9 @@
 2D Finite-element-based global DIC method (guarantee global kinematic compatibility and decrease noise by adding regularization penalties).  
 
 Welcome to give the 2D_FE_Global_DIC code ratings and comments in the MATLAB File Exchange community: 
+
 [![View 2D Finite Element Global Digital Image Correlation (FE-DIC) on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/82873-2d-finite-element-global-digital-image-correlation-fe-dic) 
-[![DOI](https://data.caltech.edu/badge/312738128.svg)](https://data.caltech.edu/badge/latestdoi/312738128)
+[![DOI](https://data.caltech.edu/badge/DOI/10.22002/D1.1981.svg)](https://doi.org/10.22002/D1.1981)
 
 ## Prerequisites & Installation
 2D_FE_Global_DIC MATLAB code was tested on MATLAB versions later than R2018a. Please download and unzip the code to the MATLAB working path. Then, execute the mail file main_FE_Global_DIC.m.
