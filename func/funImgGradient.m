@@ -39,7 +39,8 @@ else
     DfDxNormalized = DfDxNormalizedtemp(4:end-3, 4:end-3);
     DfDyNormalized = DfDyNormalizedtemp(4:end-3, 4:end-3);
     
-    DfAxis = [DfDxStartx,DfDxEndx,DfDxStarty,DfDxEndy]-1;
+    DfAxis = [DfDxStartx,DfDxEndx,DfDxStarty,DfDxEndy];
+    Df.DfCropWidth = 3;
     Df.DfAxis = DfAxis; Df.imgSize = imgSize;
     Df.DfDx = DfDxNormalized;
     Df.DfDy = DfDyNormalized;

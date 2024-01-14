@@ -11,10 +11,11 @@ DIM = 2; NodesPerEle = 3; % Using cubic elements
 FEMSize = DIM*size(coordinatesFEM,1);
 
 DfDx = Df.DfDx; DfDy = Df.DfDy;
-DfAxis = Df.DfAxis; DfDxStartx = DfAxis(1); DfDxStarty = DfAxis(3);
+DfAxis = Df.DfAxis; DfCropWidth = Df.DfCropWidth;
 
 ImgPydUnit = 1; dirichlet = []; neumann = [];
 
+%%
 for stepwithinwhile = 1:100
     tic
     disp(['--- Global IC-GN iteration step',num2str(stepwithinwhile),' ---']);
@@ -63,7 +64,7 @@ for stepwithinwhile = 1:100
         pt3x = coordinatesFEM(elementsFEM(j,3),1); pt3y = coordinatesFEM(elementsFEM(j,3),2);
         
         % ------ Compute triangle area --------
-        TriArea = det([1 pt1x pt1y; 1 pt2x pt2y; 1 pt3x pt3y]);
+        TriArea = 0.5*det([1 pt1x pt1y; 1 pt2x pt2y; 1 pt3x pt3y]);
         
         % ------ Calculate DN Matrix for CST ------
         funDN1x = 1/(2*TriArea)*(pt2y-pt3y); funDN1y = 1/(2*TriArea)*(pt3x-pt2x);
@@ -80,6 +81,7 @@ for stepwithinwhile = 1:100
         
         [ptOfxAll,ptOfyAll] = ndgrid(min([pt1x,pt2x,pt3x]):max([pt1x,pt2x,pt3x]), ...
                                      min([pt1y,pt2y,pt3y]):max([pt1y,pt2y,pt3y]));
+        
         ptOfxAll = ptOfxAll(:); ptOfyAll = ptOfyAll(:); 
         
         for tempjj = 1:length(ptOfxAll)
@@ -95,16 +97,16 @@ for stepwithinwhile = 1:100
                 if ptInTriangleOrNot == 1
                     
                     % ------ Calculate N ------
-                    N1 = det([1 ptOfx ptOfy; 1 pt2x pt2y; 1 pt3x pt3y])/TriArea;
-                    N2 = det([1 ptOfx ptOfy; 1 pt3x pt3y; 1 pt1x pt1y])/TriArea;
-                    N3 = det([1 ptOfx ptOfy; 1 pt1x pt1y; 1 pt2x pt2y])/TriArea;
+                    N1 = 0.5*det([1 ptOfx ptOfy; 1 pt2x pt2y; 1 pt3x pt3y])/TriArea;
+                    N2 = 0.5*det([1 ptOfx ptOfy; 1 pt3x pt3y; 1 pt1x pt1y])/TriArea;
+                    N3 = 0.5*det([1 ptOfx ptOfy; 1 pt1x pt1y; 1 pt2x pt2y])/TriArea;
                     
                     N = [N1 0 N2 0 N3 0;
                         0 N1 0 N2 0 N3];
                     
                     % ------ Here approximate Dg(x+u)=Df(x) ------
-                    DfEle = [DfDx(ptOfx-DfDxStartx, ptOfy-DfDxStarty);
-                        DfDy(ptOfx-DfDxStartx, ptOfy-DfDxStarty)];
+                    DfEle = [DfDx(ptOfx-DfCropWidth, ptOfy-DfCropWidth);
+                        DfDy(ptOfx-DfCropWidth, ptOfy-DfCropWidth)];
                     
                     % ------ Only assemble stiffness in the first step ------
                     if (stepwithinwhile==1)

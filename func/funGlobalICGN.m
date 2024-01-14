@@ -10,21 +10,26 @@
 %       normOfW: FE-based global DIC iteration update norm;
 %       timeICGN: Time cost for each FE-based global DIC iteration;
 %
-% Author: Jin Yang, jyang526@wisc.edu or aldicdvc@gmail.com
+% Author: Jin Yang, jin.yang@austin.utexas.edu or aldicdvc@gmail.com
 % Date: 2020.10
 % =========================================================
 
-function [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol,maxIter)
-
-
+function [U, normOfW, timeICGN] = funGlobalICGN(DICmesh,Df,Img1,Img2,U,alpha,tol,maxIter,clusterNo)
+ 
 coordinatesFEM = DICmesh.coordinatesFEM;
 elementsFEM = DICmesh.elementsFEM;
-NodesPerEle = 4; % Num of nodes for each finite element
+try clusterNo = clusterNo; catch, clusterNo = 1; end
+
 DIM = 2; % Problem dimension
+NodesPerEle = 4; % Num of nodes for each finite element
 winsize = (coordinatesFEM(2,1)-coordinatesFEM(1,1))*ones(1,DIM); % or: DICpara.winsize;
 FEMSize = DIM*size(coordinatesFEM,1); % FEM problem size
-DfDx = Df.DfDx; DfDy = Df.DfDy; DfAxis = Df.DfAxis; DfDxStartx = DfAxis(1); DfDxStarty = DfAxis(3); 
+
+DfDx = Df.DfDx; DfDy = Df.DfDy; 
+DfAxis = Df.DfAxis; DfCropWidth = Df.DfCropWidth;
+
 try maxIter = maxIter; catch maxIter = 100; end % set max iteration number as 100 by default
+ImgPydUnit = 1; dirichlet = []; neumann = [];
 
  
 %% ============================================================== 
@@ -49,16 +54,17 @@ try maxIter = maxIter; catch maxIter = 100; end % set max iteration number as 10
 %% %%%%%%%%%%%%%% Start FE ICGN iteration %%%%%%%%%%%%%%% 
 for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by default
      
-    tic;  
-    
-    % ====== Initialize stiffness matrix at the first iteration ======
-    if (stepwithinwhile==1)
-       disp(['--- Global IC-GN iterations ---']);
-       INDEXAI = []; INDEXAJ = []; INDEXAVAL = []; INDEXAREG = []; % A = sparse(FEMSize,FEMSize);
+    tic
+    disp(['--- Global IC-GN iteration step',num2str(stepwithinwhile),' ---']);
+     
+    if clusterNo==0 || clusterNo==1
+        if (stepwithinwhile==1)
+            INDEXAI = []; INDEXAJ = []; INDEXAVAL = []; INDEXAREG = [];
+            %A = sparse(2*size(coordinatesFEM,1),2*size(coordinatesFEM,1));
+        end
+        INDEXBI = []; INDEXBVAL = []; %clear b; b = sparse(2*size(coordinatesFEM,1),1);
     end
-    INDEXBI = []; INDEXBVAL = []; % clear b; b = sparse(FEMsize,1); % Update external force vector
-      
-    
+       
     % ------ Define ksi and eta list ------
     ksiList = -1:2/winsize(1):1; etaList = -1:2/winsize(2):1;
     [ksiMat,etaMat] = ndgrid(ksiList,etaList);
@@ -69,22 +75,31 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
     NMat{3} = 0.25*(1+ksiMat).*(1+etaMat); 
     NMat{4} = 0.25*(1-ksiMat).*(1+etaMat); 
          
-    hbar = waitbar(0,['Global ICGN iteration step ',num2str(stepwithinwhile)]);
+    if clusterNo==0 || clusterNo==1
+        hbar = waitbar(0, ['Global ICGN iteartion step: ',num2str(stepwithinwhile)]);
+    else
+        hbar=parfor_progressbar(size(elementsFEM,1),['Global ICGN iteartion step: ',num2str(stepwithinwhile)]);
+    end
+
     % ============= Each element, assemble stiffness matrix ============
-    for indEle = 1 : size(elementsFEM,1) % indEle is the element index
+    for eleInd = 1 : size(elementsFEM,1) % indEle is the element index
         
-        waitbar(indEle/size(elementsFEM,1));  
+        if clusterNo==0 || clusterNo==1
+            waitbar(eleInd/size(elementsFEM,1));
+        else
+            hbar.iterate(1);
+        end  
         
         tempA = zeros(DIM*NodesPerEle, DIM*NodesPerEle); tempb = tempA(:,1);
          
         % ------ Find four corner points in Q4 FE element ------
-        pt1x = coordinatesFEM(elementsFEM(indEle,1),1); pt1y = coordinatesFEM(elementsFEM(indEle,1),2);
-        pt2x = coordinatesFEM(elementsFEM(indEle,2),1); pt2y = coordinatesFEM(elementsFEM(indEle,2),2);
-        pt3x = coordinatesFEM(elementsFEM(indEle,3),1); pt3y = coordinatesFEM(elementsFEM(indEle,3),2);
-        pt4x = coordinatesFEM(elementsFEM(indEle,4),1); pt4y = coordinatesFEM(elementsFEM(indEle,4),2);
+        pt1x = coordinatesFEM(elementsFEM(eleInd,1),1); pt1y = coordinatesFEM(elementsFEM(eleInd,1),2);
+        pt2x = coordinatesFEM(elementsFEM(eleInd,2),1); pt2y = coordinatesFEM(elementsFEM(eleInd,2),2);
+        pt3x = coordinatesFEM(elementsFEM(eleInd,3),1); pt3y = coordinatesFEM(elementsFEM(eleInd,3),2);
+        pt4x = coordinatesFEM(elementsFEM(eleInd,4),1); pt4y = coordinatesFEM(elementsFEM(eleInd,4),2);
          
         % ------ Find element nodal indices ------
-        tp = ones(1,DIM); tempIndexU = DIM*elementsFEM(indEle,[tp,2*tp,3*tp,4*tp]);
+        tp = ones(1,DIM); tempIndexU = DIM*elementsFEM(eleInd,[tp,2*tp,3*tp,4*tp]);
         for tempDIM = 1:DIM-1
             tempIndexU(tempDIM:DIM:end) = tempIndexU(tempDIM:DIM:end)-(DIM-tempDIM);
         end % size of tempIndexU: 1*8
@@ -104,19 +119,19 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
         
         
         ptOfxAll = ptOfxAll(:); ptOfyAll = ptOfyAll(:); % Garantuee ptOfxAll and ptOfyAll are column vectors
-        for tempjj = 1:length(ptOfxAll) % Write into one for-loop instead of two for-loops
+        for ptInd = 1:length(ptOfxAll) % Write into one for-loop instead of two for-loops
         % for ptOfx = pt1x:pt3x
         %    for ptOfy = pt1y:pt3y
-            ptOfx = ptOfxAll(tempjj); ptOfy = ptOfyAll(tempjj);
+            ptOfx = ptOfxAll(ptInd); ptOfy = ptOfyAll(ptInd);
               
                 % ------ Calculate ksi and eta ------
-                ksi = ksiMat(tempjj); eta = etaMat(tempjj);
+                ksi = ksiMat(ptInd); eta = etaMat(ptInd);
                 % ksi = l(1)*pointOfx*pointOfy + l(2)*pointOfx + l(3)*pointOfy + l(4) ;
                 % eta = m(1)*pointOfx*pointOfy + m(2)*pointOfx + m(3)*pointOfy + m(4) ;
                 
                 % ------ Calculate N matrix ------
-                N1 = NMat{1}(tempjj); N2 = NMat{2}(tempjj); 
-                N3 = NMat{3}(tempjj); N4 = NMat{4}(tempjj);
+                N1 = NMat{1}(ptInd); N2 = NMat{2}(ptInd); 
+                N3 = NMat{3}(ptInd); N4 = NMat{4}(ptInd);
                 % N1 = (1-ksi)*(1-eta)*0.25; N2 = (1+ksi)*(1-eta)*0.25;
                 % N3 = (1+ksi)*(1+eta)*0.25; N4 = (1-ksi)*(1+eta)*0.25;
                 
@@ -151,8 +166,8 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
                 
                  
                 % ------ Here approximate Dg(x+u)=Df(x) ------
-                DfEle = [DfDx(ptOfx-DfDxStartx, ptOfy-DfDxStarty); 
-                         DfDy(ptOfx-DfDxStartx, ptOfy-DfDxStarty)];
+                DfEle = [DfDx(ptOfx-DfCropWidth, ptOfy-DfCropWidth); 
+                         DfDy(ptOfx-DfCropWidth, ptOfy-DfCropWidth)];
                 
                 % ------ Only assemble stiffness in the first step ------
                 if (stepwithinwhile==1)
@@ -164,7 +179,7 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
                 %temp1 = [pointOfx;pointOfy] + N*U(temp);
                 %tempb = ((f(pointOfx ,pointOfy) - fungInterpolation_g(temp1(1), temp1(2), g(floor(temp1(1))-1:floor(temp1(1))+2, floor(temp1(2))-1:floor(temp1(2))+2))) * (N'*Df));
                 %b(tempIndexU) = b(tempIndexU) + tempb - (alpha*(DN')*DN)*U(temp);
-                temp2 = (Img1(ptOfx,ptOfy) - tempg(tempjj)) * (N'*DfEle);
+                temp2 = (Img1(ptOfx,ptOfy) - tempg(ptInd)) * (N'*DfEle);
                 tempb = tempb + temp2 - (alpha*(DN')*DN) * U(tempIndexU);
                 
                 % ====== Optional ======
@@ -188,30 +203,59 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
     close(hbar);
     
     if (stepwithinwhile==1)
+        % A = sparse(FEMSize, FEMSize);
+        % for eleInd = 1:size(elementsFEM,1)
+        %   A = A + sparse(INDEXAIpar{eleInd}, INDEXAJpar{eleInd}, INDEXAVALpar{eleInd}, FEMSize,FEMSize) ;
+        %end
         A = sparse(INDEXAI,INDEXAJ,INDEXAVAL,FEMSize,FEMSize);
     end
+    
     b = sparse(INDEXBI,ones(length(INDEXBI),1),INDEXBVAL,FEMSize,1);
+    % b = sparse(FEMSize,1);
+    % for eleInd = 1:size(elementsFEM,1)
+    %     b = b + sparse(double(INDEXBIpar{eleInd}),ones(length(INDEXBIpar{eleInd}),1),INDEXBVALpar{eleInd}, FEMSize,1) ;
+    % end
     
-    % ========= Solve FEM problem ===========
-    W = A\b;
+
+    % ====== Find involved coordiantes index ======
+    coordsIndexInvolved = unique(elementsFEM);
+    if coordsIndexInvolved(1) == 0
+        UIndexInvolved = [coordsIndexInvolved(2:end);coordsIndexInvolved(2:end)];
+        % Not including the first 0-th entry
+        for tempi = 1:(size(coordsIndexInvolved,1)-1)
+            UIndexInvolved(2*tempi-1:2*tempi) = [2*coordsIndexInvolved(tempi+1)-1; 2*coordsIndexInvolved(tempi+1)];
+        end
+    else
+        UIndexInvolved = [2*coordsIndexInvolved-1;2*coordsIndexInvolved];
+        
+    end
     
-    normW = norm(W)/sqrt(size(W,1)); 
+    
+    W = sparse(2*size(coordinatesFEM,1),1);
+    W(2*unique(dirichlet)) = 0;
+    W(2*unique(dirichlet)-1) = 0;
+    
+    dirichlettemp = [2*dirichlet; 2*dirichlet-1];
+    FreeNodes = setdiff(UIndexInvolved,unique(dirichlettemp));
+    
+    W(FreeNodes) = A(FreeNodes,FreeNodes)\b(FreeNodes);
+    
+    normW = norm(W)/sqrt(size(W,1))
     normOfW(stepwithinwhile) = normW;
-    timeICGN(stepwithinwhile) = toc; 
+    timeICGN(stepwithinwhile) = toc;
+    toc
     U = reshape(U,length(U),1); W = reshape(W,length(W),1);
     
-    disp(['normW = ',num2str(normW),' at iter ',num2str(stepwithinwhile),'; time cost = ',num2str(toc),'s']);
-     
     if stepwithinwhile == 1
         normWOld = normW*10;
     else
         normWOld = normOfW(stepwithinwhile-1);
     end
     
-    if (normW < tol) % || ((normW/normWOld > 0.9) && (normW/normWOld < 1))
-        U = U + W; 
+    if (normW < tol) || ((normW/normWOld > 1-tol) && (normW/normWOld < 1))
+        U = U + W;
         break;
-    elseif (normW >= tol && normW < (0.1/tol)) % || ((normW/normWOld >= 1) && (normW/normWOld < 100)))
+    elseif (normW >= tol && normW < 1/tol)
         U = U + W;
     else
         warning('Get diverged in Global_ICGN!!!')

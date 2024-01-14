@@ -25,7 +25,8 @@ NodesPerEle = 4; % Num of nodes for each finite element
 DIM = 2; % Problem dimension
 % winsize = (coordinatesFEM(2,1)-coordinatesFEM(1,1))*ones(1,DIM); % or: DICpara.winsize;
 FEMSize = DIM * size(coordinatesFEM,1); % FEM problem size
-DfDx = Df.DfDx; DfDy = Df.DfDy; DfAxis = Df.DfAxis; DfDxStartx = DfAxis(1); DfDxStarty = DfAxis(3);
+DfDx = Df.DfDx; DfDy = Df.DfDy; DfAxis = Df.DfAxis; 
+DfCropWidth = Df.DfCropWidth;
 try maxIter = maxIter; catch maxIter = 100; end % set max iteration number as 100 by default
 
 
@@ -63,7 +64,7 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
     
     hbar = waitbar(0,['Global ICGN iteration step ',num2str(stepwithinwhile)]);
     % ============= Each element, assemble stiffness matrix ============
-    for indEle = 1 : size(elementsFEM,1) % indEle is the element index
+    parfor indEle = 1 : size(elementsFEM,1) % indEle is the element index
         
         waitbar(indEle/size(elementsFEM,1));
         
@@ -76,12 +77,12 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
         pt4x = coordinatesFEM(elementsFEM(indEle,4),1); pt4y = coordinatesFEM(elementsFEM(indEle,4),2);
         
         
-        lMatrix = [pt1x*pt1y pt1x pt1y 1;
-                    pt2x*pt2y pt2x pt2y 1;
-                    pt3x*pt3y pt3x pt3y 1;
-                    pt4x*pt4y pt4x pt4y 1];
-        
         % ------ Find linear interpolation coefficients ------
+        lMatrix = [pt1x*pt1y pt1x pt1y 1;
+                   pt2x*pt2y pt2x pt2y 1;
+                   pt3x*pt3y pt3x pt3y 1;
+                   pt4x*pt4y pt4x pt4y 1];
+        
         lb = [-1;1;1;-1];
         l = linsolve(lMatrix,lb);
         
@@ -158,10 +159,10 @@ for stepwithinwhile = 1:maxIter % Max iteration number is set to be 100 by defau
                 0 funDN1Dksi(ksi,eta) 0 funDN2Dksi(ksi,eta) 0 funDN3Dksi(ksi,eta) 0 funDN4Dksi(ksi,eta);
                 0 funDN1Deta(ksi,eta) 0 funDN2Deta(ksi,eta) 0 funDN3Deta(ksi,eta) 0 funDN4Deta(ksi,eta)];
             
-            
+              
             % ------ Here approximate Dg(x+u)=Df(x) ------
-            DfEle = [DfDx(ptOfx-DfDxStartx, ptOfy-DfDxStarty);
-                     DfDy(ptOfx-DfDxStartx, ptOfy-DfDxStarty)];
+            DfEle = [DfDx(ptOfx-DfCropWidth, ptOfy-DfCropWidth);
+                     DfDy(ptOfx-DfCropWidth, ptOfy-DfCropWidth)];
             
             % ------ Only assemble stiffness in the first step ------
             if (stepwithinwhile==1)
