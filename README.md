@@ -39,7 +39,7 @@ I also attach my EASF webinar to introduce AL-DIC/DVC algorithm and review other
 
 ## Contact and support
 I appreciate your comments and ratings to help me further improve this code. If you have other questions, feel free to contact me.
-Jin Yang (Caltech, solid mechanics, PhD '19): jyang526@wisc.edu  -or-  aldicdvc@gmail.com
+Jin Yang (Caltech, majoring in solid mechanics, PhD '19): jin.yang@austin.utexas.edu  -or-  aldicdvc@gmail.com
 
 
 
