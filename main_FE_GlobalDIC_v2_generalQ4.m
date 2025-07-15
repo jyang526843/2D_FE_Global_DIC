@@ -24,7 +24,7 @@ fprintf('------------ Section 2 Start ------------ \n')
 
 % ====== Load mat file for your mesh coordinates and elements ======
 % User needs to modify these lines to upload his/her own FE-mesh
-load('./Images_Sample12/mesh_plate_hole.mat');
+load('./Images_Sample12/mesh_plate_hole_Q4.mat');
 DICmesh.coordinatesFEM = coordinatesFEM;
 DICmesh.coordinatesFEMWorld = [coordinatesFEM(:,1),size(Img{1},2)+1-coordinatesFEM(:,2)];
 DICmesh.elementsFEM = elementsFEM;
