@@ -93,10 +93,15 @@ strain_maxshear = sqrt((0.5*(strain_exx-strain_eyy)).^2 + strain_exy.^2);
 % Principal strain
 strain_principal_max = 0.5*(strain_exx+strain_eyy) + strain_maxshear;
 strain_principal_min = 0.5*(strain_exx+strain_eyy) - strain_maxshear;
-% equivalent von Mises strain
-strain_vonMises = sqrt(strain_principal_max.^2 + strain_principal_min.^2 - ...
-             strain_principal_max.*strain_principal_min + 3*strain_maxshear.^2);
- 
+% 2D equivalent von Mises strain
+strain_vonMises = 2/3 * sqrt(strain_principal_max.^2 + strain_principal_min.^2 - ...
+             strain_principal_max.*strain_principal_min );
+% There was a mistake before in computing "strain_vonMises":   previous "+ 3*strain_maxshear.^2" term should not be included.
+% Please be careful on computing von Mises strain, there can be a different formula to use 
+% Some people define it as: " sqrt(strain_principal_max.^2 + strain_principal_min.^2 ...
+%                                   - strain_principal_max.*strain_principal_min );"
+% Link: https://help.csiamerica.com/help/sap2000/26/26.0.0/SAP2000/WebHelp/Menus/Display/Show_Forces_Stresses/Von_Mises_Stress.htm
+
 % Please don't delete this line, to deal with the image and physical world coordinates       
 [x2,y2]=ndgrid(x2,y2); x2=x2'; y2=y2';
 
